@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+// Not used
 void usage() {
     std::cout << "usage: bf source [args]" << std::endl << "args:"
         << "\n\t-h --help: print this"
