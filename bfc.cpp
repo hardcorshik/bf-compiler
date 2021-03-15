@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#define MEMORY 256
+#define DEFAULT_MEMORY 256
 #define CC "gcc"
 
 void usage();
@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
        return -1;
    }
 
+    int memory = DEFAULT_MEMORY;
     int removeCode = 1;
     std::string cfilepath = argv[1];
     cfilepath.append(".c");
@@ -25,7 +26,7 @@ int main(int argc, char** argv) {
     std::string output = "a.out";
 
     char opt;
-    while ((opt = getopt(argc, argv, "hco:")) != -1) {
+    while ((opt = getopt(argc, argv, "hco:m:")) != -1) {
         switch (opt) {
             case 'h':
                 usage();
@@ -35,6 +36,9 @@ int main(int argc, char** argv) {
                 break;
             case 'o':
                 output = optarg;
+                break;
+            case 'm':
+                memory = atoi(optarg);
                 break;
             case '?':
                 break;
@@ -55,7 +59,7 @@ int main(int argc, char** argv) {
 
     // setup C file
     cfile << "#include <stdio.h>" << std::endl
-        << "int main(){char mem[" << MEMORY << "]={0};int ptr;";
+        << "int main(){char mem[" << memory << "]={0};int ptr;";
 
     // The only compilation error that we need to account for
     int unbalancedLoops = 0;
@@ -105,8 +109,9 @@ int main(int argc, char** argv) {
 void usage() {
     std::cout << "usage: bfc [source] <args>" << std::endl << "args:"
         << "\n\t-h: print this"
-        << "\n\t-o [file]: set output file"
         << "\n\t-c: don't remove compiled C file"
+        << "\n\t-o [file]: set output file"
+        << "\n\t-m [memory]: sets memory for the brainfuck program"
         << std::endl;
     exit(0);
 }
