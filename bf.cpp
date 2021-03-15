@@ -1,25 +1,46 @@
+#include <cstdio>
 #include <iostream>
 #include <fstream>
-#include <errno.h>
 #include <string>
 #include <cstring>
+#include <errno.h>
+#include <unistd.h>
 
 #define MEMORY 256
+#define CC "gcc"
 
 void usage();
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        std::cout << "usage: bf <source> <output>" << std::endl;
-        return -1;
+   if (argc < 2) {
+       std::cout << "usage: bf [source] <args>" << std::endl;
+       return -1;
+   }
+
+    int removeCode = 1;
+    std::string cfilepath = argv[1];
+    cfilepath.append(".c");
+
+    std::string output = "a.out";
+
+    char opt;
+    while ((opt = getopt(argc, argv, "hco:")) != -1) {
+        switch (opt) {
+            case 'h':
+                usage();
+                break;
+            case 'c':
+                removeCode = 0;
+                break;
+            case 'o':
+                output = optarg;
+                break;
+            case '?':
+                break;
+        }
     }
 
-    char cfilepath[50];
-    char outfile[50];
-
-    snprintf(cfilepath, sizeof(cfilepath), "%s.c", argv[1]);
-
-    std::ifstream source(argv[1]);
+    std::ifstream source(argv[optind]);
     std::ofstream cfile(cfilepath);
 
     if (!source.good()) {
@@ -36,7 +57,7 @@ int main(int argc, char** argv) {
         << "int main(){char mem[" << MEMORY << "]={0};int ptr;";
 
     // The only compilation error that we need to account for
-    int unbalancedLoops;
+    int unbalancedLoops = 0;
 
     char command;
     while (source.read(&command, 1)) {
@@ -65,23 +86,26 @@ int main(int argc, char** argv) {
     cfile.close();
 
     if (unbalancedLoops) {
-        remove(cfilepath);
+        if (removeCode) remove(cfilepath.c_str());
         std::cout << "error: brackets are unbalanced" << std::endl;
         return -1;
     }
 
-    char compileCommand[100];
-    snprintf(compileCommand, sizeof(compileCommand), "gcc %s -o %s", cfilepath, argv[2]);
-    system(compileCommand);
-    remove(cfilepath);
+    std::string compileCommand = CC;
+    compileCommand += " " + cfilepath + " -o " + output;
+
+    system(compileCommand.c_str());
+    if (removeCode) remove(cfilepath.c_str());
 
     return 0;
 }
 
 // Not used
 void usage() {
-    std::cout << "usage: bf source [args]" << std::endl << "args:"
-        << "\n\t-h --help: print this"
-        << "\n\t-o --out [file]: set output file"
-        << "\n\t-c: don't remove compiled C file";
+    std::cout << "usage: bf [source] <args>" << std::endl << "args:"
+        << "\n\t-h: print this"
+        << "\n\t-o [file]: set output file"
+        << "\n\t-c: don't remove compiled C file"
+        << std::endl;
+    exit(0);
 }
