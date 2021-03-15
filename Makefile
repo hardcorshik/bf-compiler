@@ -1,6 +1,8 @@
 CC = g++
 CFLAGS = -g -Wall
-TARGET = bf
+TARGET = bfc
+INSTALL = install
+INSTALL_LOCATION = /usr/bin
 
 all: $(TARGET)
 
@@ -9,3 +11,6 @@ $(TARGET): $(TARGET).cpp
 
 clean:
 	rm $(TARGET)
+
+install: all
+	$(INSTALL) -D $(TARGET) $(INSTALL_LOCATION)

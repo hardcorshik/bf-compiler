@@ -14,7 +14,7 @@ void usage();
 
 int main(int argc, char** argv) {
    if (argc < 2) {
-       std::cout << "usage: bf [source] <args>" << std::endl;
+       std::cout << "usage: bfc [source] <args>" << std::endl;
        return -1;
    }
 
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
 
 // Not used
 void usage() {
-    std::cout << "usage: bf [source] <args>" << std::endl << "args:"
+    std::cout << "usage: bfc [source] <args>" << std::endl << "args:"
         << "\n\t-h: print this"
         << "\n\t-o [file]: set output file"
         << "\n\t-c: don't remove compiled C file"
